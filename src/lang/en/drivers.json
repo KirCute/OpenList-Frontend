@@ -76,6 +76,8 @@
     "root_folder_id": "Root folder id"
   },
   "123Pan": {
+    "UploadThread": "UploadThread",
+    "UploadThread-tips": "the threads of upload",
     "password": "Password",
     "root_folder_id": "Root folder id",
     "username": "Username"
@@ -856,6 +858,8 @@
     "username": "Username"
   },
   "Strm": {
+    "downloadFileTypes": "DownloadFileTypes",
+    "downloadFileTypes-tips": "Files need to download with strm (usally subtitles)",
     "encodePath": "EncodePath",
     "encodePath-tips": "encode the path in the strm file",
     "filterFileTypes": "FilterFileTypes",
