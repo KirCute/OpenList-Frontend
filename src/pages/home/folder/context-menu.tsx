@@ -1,5 +1,5 @@
 import { Menu, Item, Submenu } from "solid-contextmenu"
-import { useCopyLink, useDownload, useLink, useT } from "~/hooks"
+import { useCopyLink, useDownload, useLink, useRouter, useT } from "~/hooks"
 import "solid-contextmenu/dist/style.css"
 import { HStack, Icon, Text, useColorMode, Image } from "@hope-ui/solid"
 import { operations } from "../toolbar/operations"
@@ -42,6 +42,7 @@ export const ContextMenu = () => {
     return UserMethods.is_admin(me()) || getSettingBool("package_download")
   }
   const { rawLink } = useLink()
+  const { isShare } = useRouter()
   return (
     <Menu
       id={1}
@@ -54,7 +55,7 @@ export const ContextMenu = () => {
           <Item
             hidden={() => {
               const index = UserPermissions.findIndex((item) => item === name)
-              return !UserMethods.can(me(), index)
+              return isShare() || !UserMethods.can(me(), index)
             }}
             onClick={() => {
               bus.emit("tool", name)
@@ -71,9 +72,12 @@ export const ContextMenu = () => {
               (item) => item === "decompress",
             )
             return (
-              !UserMethods.can(me(), index) ||
-              selectedObjs()[0].is_dir ||
-              !isArchive(selectedObjs()[0].name)
+              isShare() ||
+              !(
+                !UserMethods.can(me(), index) ||
+                selectedObjs()[0].is_dir ||
+                !isArchive(selectedObjs()[0].name)
+              )
             )
           }}
           onClick={() => {

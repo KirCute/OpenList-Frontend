@@ -6,6 +6,7 @@ import {
   lazy,
   Match,
   on,
+  Show,
   Suspense,
   Switch,
 } from "solid-js"
@@ -32,7 +33,7 @@ export { objBoxRef }
 export const Obj = () => {
   const t = useT()
   const cardBg = useColorModeValue("white", "$neutral3")
-  const { pathname, searchParams } = useRouter()
+  const { pathname, searchParams, isShare } = useRouter()
   const { handlePathChange, refresh } = usePath()
   const pagination = getPagination()
   const page = createMemo(() => {
@@ -81,21 +82,27 @@ export const Obj = () => {
           </Match>
           <Match when={objStore.state === State.NeedPassword}>
             <Password
-              title={t("home.input_password")}
+              title={
+                isShare()
+                  ? t("shares.input_password")
+                  : t("home.input_password")
+              }
               password={password}
               setPassword={setPassword}
               enterCallback={() => refresh(true)}
             >
-              <Text>{t("global.have_account")}</Text>
-              <Text
-                color="$info9"
-                as={LinkWithBase}
-                href={`/@login?redirect=${encodeURIComponent(
-                  location.pathname,
-                )}`}
-              >
-                {t("global.go_login")}
-              </Text>
+              <Show when={!isShare()}>
+                <Text>{t("global.have_account")}</Text>
+                <Text
+                  color="$info9"
+                  as={LinkWithBase}
+                  href={`/@login?redirect=${encodeURIComponent(
+                    location.pathname,
+                  )}`}
+                >
+                  {t("global.go_login")}
+                </Text>
+              </Show>
             </Password>
           </Match>
           <Match

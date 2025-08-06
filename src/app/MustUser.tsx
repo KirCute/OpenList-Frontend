@@ -25,4 +25,38 @@ const MustUser = (props: { children: JSXElement }) => {
   )
 }
 
-export { MustUser }
+const UserOrGuest = (props: { children: JSXElement }) => {
+  const [loading, data] = useFetch((): PResp<Me> => r.get("/me"))
+  const [skipLogin, setSkipLogin] = createSignal(false)
+  ;(async () => {
+    handleResp(
+      await data(),
+      setMe,
+      (_msg, _code) => {
+        setMe({
+          id: 2,
+          username: "guest",
+          password: "",
+          base_path: "/",
+          role: 1,
+          disabled: false,
+          permission: 0,
+          sso_id: "",
+          otp: false,
+        })
+        setSkipLogin(true)
+      },
+      false,
+      false,
+    )
+  })()
+  return (
+    <Switch fallback={props.children}>
+      <Match when={!skipLogin() && loading()}>
+        <FullScreenLoading />
+      </Match>
+    </Switch>
+  )
+}
+
+export { MustUser, UserOrGuest }
