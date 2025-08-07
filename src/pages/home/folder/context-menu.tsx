@@ -65,27 +65,25 @@ export const ContextMenu = () => {
           </Item>
         )}
       </For>
+      <Item
+        hidden={() => {
+          const index = UserPermissions.findIndex(
+            (item) => item === "decompress",
+          )
+          return (
+            isShare() ||
+            !UserMethods.can(me(), index) ||
+            selectedObjs().some((o) => o.is_dir) ||
+            selectedObjs().some((o) => !isArchive(o.name))
+          )
+        }}
+        onClick={() => {
+          bus.emit("tool", "decompress")
+        }}
+      >
+        <ItemContent name="decompress" />
+      </Item>
       <Show when={oneChecked()}>
-        <Item
-          hidden={() => {
-            const index = UserPermissions.findIndex(
-              (item) => item === "decompress",
-            )
-            return (
-              isShare() ||
-              !(
-                !UserMethods.can(me(), index) ||
-                selectedObjs()[0].is_dir ||
-                !isArchive(selectedObjs()[0].name)
-              )
-            )
-          }}
-          onClick={() => {
-            bus.emit("tool", "decompress")
-          }}
-        >
-          <ItemContent name="decompress" />
-        </Item>
         <Item
           onClick={({ props }) => {
             if (props.is_dir) {
