@@ -45,6 +45,9 @@ export const Obj = () => {
   let lastPage: number | undefined
   createEffect(
     on([pathname, page], async ([pathname, page]) => {
+      if (searchParams["pwd"]) {
+        setPassword(searchParams["pwd"])
+      }
       if (lastPathname) {
         recordHistory(lastPathname, lastPage)
       }

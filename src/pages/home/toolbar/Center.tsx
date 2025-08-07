@@ -44,7 +44,16 @@ export const Center = () => {
             }}
           >
             <Show when={!isShare()}>
-              <For each={["rename", "move", "copy", "delete", "decompress"]}>
+              <For
+                each={[
+                  "rename",
+                  "move",
+                  "copy",
+                  "delete",
+                  "share",
+                  "decompress",
+                ]}
+              >
                 {(name) => {
                   return (
                     <CenterIcon

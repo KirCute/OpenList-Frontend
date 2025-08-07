@@ -4,13 +4,16 @@ import {
   Center,
   FormControl,
   FormLabel,
+  HStack,
+  IconButton,
   Input,
   Select,
   Switch as HopeSwitch,
   Textarea,
 } from "@hope-ui/solid"
-import { Match, Switch } from "solid-js"
+import { Match, Show, Switch } from "solid-js"
 import { SelectOptions } from "~/components"
+import { TbRefresh } from "solid-icons/tb"
 
 export type ItemProps = {
   name: string
@@ -40,6 +43,7 @@ export type ItemProps = {
       type: Type.String | Type.Text
       onChange?: (value: string) => void
       value: string
+      random?: () => string
     }
   | {
       type: Type.Select
@@ -63,18 +67,32 @@ const Item = (props: ItemProps) => {
       </FormLabel>
       <Switch fallback={<Center>{t("settings.unknown_type")}</Center>}>
         <Match when={props.type === Type.String}>
-          <Input
-            id={props.name}
-            type="text"
-            readOnly={props.readonly}
-            value={props.value as string}
-            invalid={!props.valid}
-            onChange={
-              props.type === Type.String
-                ? (e) => props.onChange?.(e.currentTarget.value)
-                : undefined
-            }
-          />
+          <HStack w="$full" spacing="$2">
+            <Input
+              id={props.name}
+              type="text"
+              readOnly={props.readonly}
+              value={props.value as string}
+              invalid={!props.valid}
+              onChange={
+                props.type === Type.String
+                  ? (e) => props.onChange?.(e.currentTarget.value)
+                  : undefined
+              }
+            />
+            <Show when={props.type === Type.String && props.random}>
+              <IconButton
+                colorScheme="neutral"
+                aria-label="random"
+                icon={<TbRefresh />}
+                onClick={
+                  props.type === Type.String
+                    ? () => props.onChange?.(props.random!())
+                    : undefined
+                }
+              />
+            </Show>
+          </HStack>
         </Match>
         <Match when={props.type === Type.Number}>
           <Input
@@ -134,7 +152,7 @@ const Item = (props: ItemProps) => {
           <Select
             id={props.name}
             readOnly={props.readonly}
-            defaultValue={props.value}
+            value={props.value}
             invalid={!props.valid}
             onChange={
               props.type === Type.Select
@@ -148,8 +166,7 @@ const Item = (props: ItemProps) => {
               options={props.options!.split(",").map((key) => ({
                 key,
                 label: t(
-                  (props.options_prefix ?? `shares.${props.name}_list`) +
-                    `.${key}`,
+                  (props.options_prefix ?? `shares.${props.name}s`) + `.${key}`,
                 ),
               }))}
             />

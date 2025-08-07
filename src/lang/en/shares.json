@@ -33,5 +33,6 @@
     "front": "Extract to front",
     "back": "Extract to back"
   },
-  "input_password": "Please input share code"
+  "input_password": "Please input share code",
+  "copy_msg": "Copy link"
 }

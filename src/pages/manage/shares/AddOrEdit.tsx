@@ -1,11 +1,18 @@
 import { useFetch, useRouter, useT } from "~/hooks"
-import { PResp, Share, ShareInfo, ShareUpdate, Type } from "~/types"
-import { handleResp, notify, r } from "~/utils"
+import {
+  OrderDirection,
+  PResp,
+  Share,
+  ShareInfo,
+  ShareUpdate,
+  Type,
+} from "~/types"
+import { handleResp, notify, r, randomPwd } from "~/utils"
 import { createStore } from "solid-js/store"
 import { Button, Heading } from "@hope-ui/solid"
 import { MaybeLoading } from "~/components"
 import { ResponsiveGrid } from "../common/ResponsiveGrid"
-import { createSignal, Show } from "solid-js"
+import { batch, createSignal, Show } from "solid-js"
 import { Item } from "./Item"
 
 const AddOrEdit = () => {
@@ -18,24 +25,26 @@ const AddOrEdit = () => {
   )
   const [share, setShare] = createStore<Share | ShareUpdate>({} as Share)
   const [files, setFiles] = createSignal("")
+  const [filesValid, setFilesValid] = createSignal(false)
   const [expireString, setExpireString] = createSignal("")
   const [expireValid, setExpireValid] = createSignal(true)
-  const [filesValid, setFilesValid] = createSignal(false)
   const initEdit = async () => {
     const shareResp = await loadShare()
     handleResp(shareResp, (shareData) => {
-      setShare(shareData as ShareUpdate)
-      setFiles(shareData.files.join("\n"))
-      if (share.expires) {
-        setExpireString(new Date(share.expires).toLocaleString())
-      }
-      setFilesValid(true)
+      batch(() => {
+        setShare(shareData as ShareUpdate)
+        setFiles(shareData.files.join("\n"))
+        if (share.expires) {
+          setExpireString(new Date(share.expires).toLocaleString())
+        }
+        setFilesValid(true)
+      })
     })
   }
   if (id) {
     initEdit()
   }
-  const [okLoading, ok] = useFetch((): PResp<{ id: number }> => {
+  const [okLoading, ok] = useFetch((): PResp<ShareInfo> => {
     return r.post(`/share/${id ? "update" : "create"}`, share)
   })
   return (
@@ -67,6 +76,36 @@ const AddOrEdit = () => {
           }}
         />
         <Item
+          name="extract_folder"
+          type={Type.Select}
+          value={share.extract_folder}
+          valid
+          options="front,back"
+          onChange={(o: any) => {
+            setShare("extract_folder", o)
+          }}
+        />
+        <Item
+          name="order_by"
+          type={Type.Select}
+          value={share.order_by}
+          valid
+          options="name,size,modified"
+          onChange={(o: any) => {
+            setShare("order_by", o)
+          }}
+        />
+        <Item
+          name="order_direction"
+          type={Type.Select}
+          value={share.order_direction}
+          valid
+          options="asc,desc"
+          onChange={(o: any) => {
+            setShare("order_direction", o)
+          }}
+        />
+        <Item
           name="pwd"
           type={Type.String}
           value={share.pwd}
@@ -74,6 +113,7 @@ const AddOrEdit = () => {
           onChange={(p) => {
             setShare("pwd", p)
           }}
+          random={randomPwd}
         />
         <Item
           name="max_accessed"
@@ -147,7 +187,7 @@ const AddOrEdit = () => {
               notify.success(t("global.save_success"))
               back()
             },
-            (msg, code) => {
+            (_msg, _code) => {
               if (resp.data.id) {
                 to(`/@manage/shares/edit/${resp.data.id}`)
               }

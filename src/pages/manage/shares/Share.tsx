@@ -1,9 +1,17 @@
 import { PEmptyResp, ShareInfo, UserMethods } from "~/types"
-import { useFetch, useRouter, useT } from "~/hooks"
+import { useFetch, useRouter, useT, useUtil } from "~/hooks"
 import { Badge, Button, HStack, Td, Tr } from "@hope-ui/solid"
-import { handleResp, handleRespWithNotifySuccess, notify, r } from "~/utils"
+import {
+  base_path,
+  handleResp,
+  handleRespWithNotifySuccess,
+  makeTemplateData,
+  matchTemplate,
+  notify,
+  r,
+} from "~/utils"
 import { DeletePopover } from "../common/DeletePopover"
-import { me } from "~/store"
+import { getSetting, me } from "~/store"
 import { Show } from "solid-js"
 
 interface ShareProps {
@@ -111,11 +119,12 @@ export function ShareListItem(props: ShareProps) {
     ) {
       return "invalid"
     }
-    if (!props.canShare) {
+    if (props.share.creator === me().username && !props.canShare) {
       return "denied"
     }
     return "work"
   }
+  const { copy } = useUtil()
   return (
     <Tr>
       <Td>{path()}</Td>
@@ -135,6 +144,21 @@ export function ShareListItem(props: ShareProps) {
       <Td>{props.share.remark}</Td>
       <Td>
         <HStack spacing="$2">
+          <Button
+            colorScheme="primary"
+            onClick={() => {
+              const templateData = makeTemplateData(props.share, {
+                site_title: getSetting("site_title"),
+              })
+              const msg = matchTemplate(
+                getSetting("share_summary_content"),
+                templateData,
+              )
+              copy(msg)
+            }}
+          >
+            {t("shares.copy_msg")}
+          </Button>
           <ShareOp {...props} />
         </HStack>
       </Td>

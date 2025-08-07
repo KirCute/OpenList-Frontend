@@ -50,7 +50,7 @@ export const ContextMenu = () => {
       theme={colorMode() !== "dark" ? "light" : "dark"}
       style="z-index: var(--hope-zIndices-popover)"
     >
-      <For each={["rename", "move", "copy", "delete"]}>
+      <For each={["rename", "move", "copy", "delete", "share"]}>
         {(name) => (
           <Item
             hidden={() => {
@@ -86,8 +86,6 @@ export const ContextMenu = () => {
         >
           <ItemContent name="decompress" />
         </Item>
-      </Show>
-      <Show when={oneChecked()}>
         <Item
           onClick={({ props }) => {
             if (props.is_dir) {

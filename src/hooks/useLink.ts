@@ -1,6 +1,13 @@
 import { objStore, selectedObjs, State, me } from "~/store"
 import { Obj } from "~/types"
-import { api, encodePath, pathDir, pathJoin, standardizePath } from "~/utils"
+import {
+  base_path,
+  api,
+  encodePath,
+  pathDir,
+  pathJoin,
+  standardizePath,
+} from "~/utils"
 import { useRouter, useUtil } from "."
 import { cookieStorage } from "@solid-primitives/storage"
 
@@ -32,7 +39,8 @@ export const getLinkByDirAndObj = (
   let prefix = isShare ? "/sd" : type === "direct" ? "/d" : "/p"
   if (type === "preview") {
     prefix = ""
-    if (!api.startsWith(location.origin)) host = location.origin
+    if (!api.startsWith(location.origin + base_path))
+      host = location.origin + base_path
   }
   let ans = `${host}${prefix}${path}`
   if (type !== "preview" && !isShare && obj.sign) {
