@@ -21,19 +21,16 @@ export const getLinkByDirAndObj = (
   isShare: boolean,
   encodeAll?: boolean,
 ) => {
-  if (type !== "preview") {
-    if (isShare) {
-      if (dir.startsWith("/@s/")) {
-        dir = dir.slice(4)
-      } else if (dir.startsWith("/%40s/")) {
-        dir = dir.slice(6)
-      }
-    } else {
-      dir = pathJoin(me().base_path, dir)
-    }
+  let path
+  if (isShare) {
+    path = standardizePath(obj.path, true)
+    if (type === "preview") path = `/@s${path}`
+  } else {
+    if (type !== "preview") dir = pathJoin(me().base_path, dir)
+    dir = standardizePath(dir, true)
+    path = `${dir}/${obj.name}`
   }
-  dir = standardizePath(dir, true)
-  let path = `${dir}/${obj.name}`
+
   path = encodePath(path, encodeAll)
   let host = api
   let prefix = isShare ? "/sd" : type === "direct" ? "/d" : "/p"
